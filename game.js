@@ -141,7 +141,7 @@ class Level {
 class LevelParser {
   constructor(actorObject = {}) {
     this.actorObject = actorObject;
-    this.symbols     = {'x': 'wall', '!': 'lava', '=': 'fireball', '|': 'fireball', 'v': 'fireball'};
+    this.symbols     = {'x': 'wall', '!': 'lava'};
   }
 
   actorFromSymbol(symbol) {
@@ -187,10 +187,7 @@ class Fireball extends Actor {
   }
 
   getNextPosition(time = 1) {
-    let pos = new Vector(0, 0);
-    pos.x   = this.pos.x + (this.speed.x * time);
-    pos.y   = this.pos.y + (this.speed.y * time);
-    return pos;
+    return new Vector(this.pos.x + (this.speed.x * time), this.pos.y + (this.speed.y * time));
   }
 
   handleObstacle() {
@@ -200,22 +197,25 @@ class Fireball extends Actor {
   act(time, level) {
     let pos = new Vector(this.getNextPosition(time).x, this.getNextPosition(time).y);
     if (!level.obstacleAt(pos, this.size)) {
-      this.pos = this.getNextPosition(time)
+      this.pos = this.getNextPosition(time);
     } else {
       this.handleObstacle();
     }
   }
 }
+
 class HorizontalFireball extends Fireball {
   constructor(pos = new Vector(0, 0)) {
     super(pos, new Vector(2, 0));
   }
 }
+
 class VerticalFireball extends Fireball {
   constructor(pos = new Vector(0, 0)) {
     super(pos, new Vector(0, 2));
   }
 }
+
 class FireRain extends Fireball {
   constructor(pos = new Vector(0, 0)) {
     super(pos, new Vector(0, 3));
