@@ -9,6 +9,7 @@ class Vector {
     if (!(vectorObj instanceof Vector)) {
       throw(new Error('Переданный аргумент неверного типа!'));
     }
+    // не объявляйте переменный через запятую, здесь их вообще можно не объявлять
     let x = this.x + vectorObj.x,
         y = this.y + vectorObj.y;
     return new Vector(x, y);
@@ -27,6 +28,8 @@ class Actor {
     this.pos   = pos;
     this.size  = size;
     this.speed = speed;
+
+    // перенести в type
     this._type = 'actor';
   }
 
@@ -59,18 +62,21 @@ class Actor {
     if (actor === this) {
       return false;
     }
+    // убрать отричание
     return !(this.left >= actor.right || this.right <= actor.left || this.bottom <= actor.top || this.top >= actor.bottom);
   }
 }
 
 class Level {
   constructor(grid = [], actors = []) {
+    // форматирование
     this.grid        = grid.slice();
     this.height      = grid.length;
     this.width       = Math.max(0, ...grid.map(item => item.length));
     this.status      = null;
     this.finishDelay = 1;
     this.actors      = actors.slice();
+    // find
     this.player      = this.actors.filter(actor => actor.type === 'player')[0];
   }
 
@@ -83,6 +89,7 @@ class Level {
       throw(new Error('Передан не верный аргумент!'));
     }
 
+    // find
     for (let actorSelf of this.actors) {
       if (actor.isIntersect(actorSelf)) {
         return actorSelf;
@@ -103,6 +110,8 @@ class Level {
       return 'lava';
     }
     for (let row of this.grid) {
+      // переменная ceil не используется - похоже тут что-то не то
+      // тут сначала нужно посчитать мин и макс значения по вертикали и горизонтали а потом в циклах пройтись по ним
       for (let ceil of row) {
         if(this.grid[Math.ceil(object.top)][Math.ceil(object.left)]) {
           return this.grid[Math.ceil(object.top)][Math.ceil(object.left)]
@@ -112,6 +121,7 @@ class Level {
   }
 
   removeActor(actor) {
+    // indexOf + slice или filter лучше
     this.actors = this.actors.reduce((mass, item) => {
       if (item !== actor) {
         mass.push(item);
@@ -125,6 +135,10 @@ class Level {
   }
 
   playerTouched(touch, actor) {
+    // можно уменьшить вложенность
+    // if (this.status !== null) {
+    //    return;
+    // }
     if (this.status === null) {
       if (touch === 'lava' || touch === 'fireball') {
         this.status = 'lost';
@@ -140,6 +154,7 @@ class Level {
 
 class LevelParser {
   constructor(actorObject = {}) {
+    // создать копию объекта
     this.actorObject = actorObject;
     this.symbols     = {'x': 'wall', '!': 'lava'};
   }
@@ -153,14 +168,18 @@ class LevelParser {
   }
 
   createGrid(plan = []) {
+    // лишнее переопределние аргумента функции.
+    // Никаких отрицательных последствий в данном случае не будет, но аргументы лучше не переопределять
     plan = plan.map(row => row.split('').map(item => this.obstacleFromSymbol(item)));
     return plan;
   }
 
   createActors(actors) {
+    // добавьте значение по-умолчанию и уберить проверку
     if (!actors.length || this.actorObject === undefined) {
       return [];
     }
+    // переопределие аргумента
     actors = actors
       .map((row, firstIndex) => row.split('').map((symbol, index) => {
         if (
@@ -183,6 +202,7 @@ class LevelParser {
 class Fireball extends Actor {
   constructor(pos = new Vector(0, 0), speed = new Vector(0, 0)) {
     super(pos, new Vector(1, 1), speed);
+    // в type()
     this._type = 'fireball';
   }
 
@@ -191,11 +211,13 @@ class Fireball extends Actor {
   }
 
   handleObstacle() {
+    // times
     this.speed = new Vector(this.speed.x * -1, this.speed.y * -1)
   }
 
   act(time, level) {
     let pos = new Vector(this.getNextPosition(time).x, this.getNextPosition(time).y);
+    // обратить условие, отрцание в if - плохо, сложнее понять что проиходит
     if (!level.obstacleAt(pos, this.size)) {
       this.pos = this.getNextPosition(time);
     } else {
@@ -230,6 +252,7 @@ class FireRain extends Fireball {
 class Coin extends Actor {
   constructor(position = new Vector(0, 0), size = new Vector(0.6, 0.6)) {
     super(position.plus(new Vector(0.2, 0.1)), size);
+    // форматирование, 'coin' в type
     this._type       = 'coin';
     this.spring      = Math.random() * 2 * Math.PI;
     this.springSpeed = 8;
@@ -257,6 +280,7 @@ class Coin extends Actor {
 class Player extends Actor {
   constructor(pos = new Vector(0, 0)) {
     super(pos.plus(new Vector(0, -0.5)), new Vector(0.8, 1.5));
+    // type()
     this._type = 'player';
   }
 }
@@ -268,6 +292,8 @@ const actorDict = {
   '|': VerticalFireball,
   '=': HorizontalFireball
 };
+
+// форматирование
 const parser    = new LevelParser(actorDict);
 loadLevels()
   .then(levels => {
