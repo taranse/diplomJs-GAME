@@ -92,19 +92,23 @@ class Level {
     }
     let object = new Actor(position, size);
     
-    if (object.left < 0 || object.right > this.width || object.bottom > this.height) {
+    if (object.left < 0 || object.right > this.width || object.top < 0) {
       return 'wall';
     }
-    if (object.top < 0) {
+    if (object.bottom > this.height) {
       return 'lava';
     }
-    for (let row of this.grid) {
-      for (let ceil of row) {
-        if (this.grid[Math.ceil(object.top)][Math.ceil(object.left)]) {
-          return this.grid[Math.ceil(object.top)][Math.ceil(object.left)]
+
+    for (let horizontal = 0; horizontal < this.width; horizontal++) {
+      for (let vertical = 0; vertical < this.height; vertical++) {
+        let ceil = new Vector(horizontal, vertical);
+        let actor = new Actor(ceil);
+        if (object.isIntersect(actor)) {
+          return this.grid[vertical][horizontal];
         }
       }
     }
+
   }
   
   removeActor(actor) {
@@ -121,7 +125,9 @@ class Level {
     }
     if (touch === 'lava' || touch === 'fireball') {
       this.status = 'lost';
-    } else if (touch === 'coin') {
+      return;
+    }
+    if (touch === 'coin') {
       this.removeActor(actor);
       if (this.noMoreActors('coin')) {
         this.status = 'won';
@@ -158,7 +164,8 @@ class LevelParser {
         ) {
           return new (this.actorFromSymbol(symbol))(new Vector(index, firstIndex))
         }
-      }).filter(symbol => symbol !== undefined))
+      })
+      .filter(symbol => symbol !== undefined))
       .reduce((array, item) => array.concat(item), []);
   }
   
@@ -271,3 +278,4 @@ loadLevels()
   .then(levels => {
     runGame(JSON.parse(levels), parser, DOMDisplay)
   });
+  //.then(console.log);
