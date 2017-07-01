@@ -7,6 +7,7 @@ class Vector {
   
   plus(vectorObj) {
     if (!(vectorObj instanceof Vector)) {
+      // скобки после throw не нужны
       throw(new Error('Переданный аргумент неверного типа!'));
     }
     return new Vector(this.x + vectorObj.x, this.y + vectorObj.y);
@@ -19,6 +20,7 @@ class Vector {
 
 class Actor {
   constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)) {
+    // тут было бы неплохо конечно сделать 3 if, чтобы по ошибке было понятно какой аргумент неправильный
     if (!(pos instanceof Vector) || !(size instanceof Vector) || !(speed instanceof Vector)) {
       throw(new Error('Переданный аргумент неверного типа!'));
     }
@@ -56,6 +58,8 @@ class Actor {
     if (actor === this) {
       return false;
     }
+
+    // сложные условия в if это не очень хорошо, я бы сделал 4 if
     if (this.left >= actor.right || this.right <= actor.left || this.bottom <= actor.top || this.top >= actor.bottom) {
       return false;
     }
@@ -79,6 +83,7 @@ class Level {
   }
   
   actorAt(actor) {
+    // instanceof
     if (!Actor.prototype.isPrototypeOf(actor)) {
       throw(new Error('Передан не верный аргумент!'));
     }
@@ -87,6 +92,7 @@ class Level {
   }
   
   obstacleAt(position, size) {
+    // instanceof и отдельные проверки для каждого аргумента
     if (!Vector.prototype.isPrototypeOf(position) || !Vector.prototype.isPrototypeOf(size)) {
       throw(new Error('Передан не верный аргумент!'));
     }
@@ -138,6 +144,8 @@ class Level {
 
 class LevelParser {
   constructor(actorObject = {}) {
+    // форматирование!
+    // копию объекта лучше создать
     this.actorObject = actorObject;
     this.symbols     = {'x': 'wall', '!': 'lava'};
   }
@@ -157,14 +165,17 @@ class LevelParser {
   createActors(actors = []) {
     return actors
       .map((row, firstIndex) => row.split('').map((symbol, index) => {
+        // этот if нужно разделить на несколько
         if (
           this.actorFromSymbol(symbol) !== undefined &&
           typeof this.actorFromSymbol(symbol) === 'function' &&
+          // объект создаётся 2 раза
           new (this.actorFromSymbol(symbol))() instanceof Actor
         ) {
           return new (this.actorFromSymbol(symbol))(new Vector(index, firstIndex))
         }
       })
+      // этого не должно тут быть, лучше изначально использовать reduce или просто пройти по массиву циклом или forEach
       .filter(symbol => symbol !== undefined))
       .reduce((array, item) => array.concat(item), []);
   }
@@ -193,6 +204,7 @@ class Fireball extends Actor {
   
   act(time, level) {
     let pos = new Vector(this.getNextPosition(time).x, this.getNextPosition(time).y);
+    // отричание в if - не очень хорошо (обратить условие)
     if (!level.obstacleAt(pos, this.size)) {
       this.pos = this.getNextPosition(time);
     } else {
@@ -278,4 +290,5 @@ loadLevels()
   .then(levels => {
     runGame(JSON.parse(levels), parser, DOMDisplay)
   });
+  // тут должно быть сообщение, что пользователь выиграл, вместо console.log можно даже alert сделать
   //.then(console.log);
