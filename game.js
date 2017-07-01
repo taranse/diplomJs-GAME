@@ -109,17 +109,21 @@ class Level {
     if (!(size instanceof Vector)) {
       throw(new Error('Передан неверный размер!'));
     }
-    let object = new Actor(position, size);
 
-    if (object.left < 0 || object.right > this.width || object.top < 0) {
+    let left = Math.floor(position.x);
+    let right = Math.ceil(position.x + size.x);
+    let top = Math.floor(position.y);
+    let bottom = Math.ceil(position.y + size.y);
+
+    if (left < 0 || right > this.width || top < 0) {
       return 'wall';
     }
-    if (object.bottom > this.height) {
+    if (bottom > this.height) {
       return 'lava';
     }
 
-    for (let horizontal = Math.floor(object.left); horizontal < Math.ceil(object.right); horizontal++) {
-      for (let vertical = Math.floor(object.top); vertical < Math.ceil(object.bottom); vertical++) {
+    for (let horizontal = left; horizontal < right; horizontal++) {
+      for (let vertical = top; vertical < bottom; vertical++) {
         if (this.grid[vertical][horizontal]) {
           return this.grid[vertical][horizontal];
         }
