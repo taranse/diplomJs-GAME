@@ -124,9 +124,9 @@ class Level {
 
     for (let horizontal = left; horizontal < right; horizontal++) {
       for (let vertical = top; vertical < bottom; vertical++) {
-        // this.grid[vertical][horizontal] вынести в переменную cell
-        if (this.grid[vertical][horizontal]) {
-          return this.grid[vertical][horizontal];
+        let cell = this.grid[vertical][horizontal];
+        if (cell) {
+          return cell;
         }
       }
     }
@@ -141,16 +141,15 @@ class Level {
     return !this.actors.some(actor => actor.type === type);
   }
 
-  // touch -> type
-  playerTouched(touch, actor) {
+  playerTouched(type, actor) {
     if (this.status !== null) {
       return;
     }
-    if (touch === 'lava' || touch === 'fireball') {
+    if (type === 'lava' || type === 'fireball') {
       this.status = 'lost';
       return;
     }
-    if (touch === 'coin') {
+    if (type === 'coin') {
       this.removeActor(actor);
       if (this.noMoreActors('coin')) {
         this.status = 'won';
@@ -161,18 +160,16 @@ class Level {
 
 class LevelParser {
   constructor(actorObject = {}) {
-    // я бы назвал actorsMap
-    this.actorObject = Object.create(actorObject);
-    // а это obstaclesMap
-    this.symbols = {'x': 'wall', '!': 'lava'};
+    this.actorsMap = Object.create(actorObject);
+    this.obstaclesMap = {'x': 'wall', '!': 'lava'};
   }
 
   actorFromSymbol(symbol) {
-    return this.actorObject[symbol];
+    return this.actorsMap[symbol];
   }
 
   obstacleFromSymbol(symbol) {
-    return this.symbols[symbol];
+    return this.obstaclesMap[symbol];
   }
 
   createGrid(plan = []) {
@@ -180,25 +177,22 @@ class LevelParser {
   }
 
   createActors(actors = []) {
-    // заменить на reduce или forEach
-    return actors.map((row, firstIndex) => {
-      return row.split('')
-        .map((symbol, index) => {
-          let constructorOfActor = this.actorFromSymbol(symbol);
-          if (constructorOfActor === undefined) {
-            return undefined;
+    return actors.reduce((array, actor, firstIndex) => {
+      actor.split('').forEach((symbol, index) => {
+        let constructorOfActor = this.actorFromSymbol(symbol);
+        if (constructorOfActor === undefined) {
+          return;
+        }
+        if (typeof constructorOfActor === 'function') {
+          let actor = new constructorOfActor(new Vector(index, firstIndex));
+          if (!(actor instanceof Actor)) {
+            return;
           }
-          if (typeof constructorOfActor === 'function') {
-            let actor = new constructorOfActor(new Vector(index, firstIndex));
-            if (!(actor instanceof Actor)) {
-              return undefined;
-            }
-            return actor;
-          } else {
-            return undefined;
-          }
-        }).filter(symbol => symbol !== undefined)
-    }).reduce((array, item) => array.concat(item), []);
+          return array.push(actor);
+        }
+      });
+      return array;
+    }, []);
   }
 
   parse(plan) {
