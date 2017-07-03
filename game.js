@@ -124,6 +124,7 @@ class Level {
 
     for (let horizontal = left; horizontal < right; horizontal++) {
       for (let vertical = top; vertical < bottom; vertical++) {
+        // this.grid[vertical][horizontal] вынести в переменную cell
         if (this.grid[vertical][horizontal]) {
           return this.grid[vertical][horizontal];
         }
@@ -140,6 +141,7 @@ class Level {
     return !this.actors.some(actor => actor.type === type);
   }
 
+  // touch -> type
   playerTouched(touch, actor) {
     if (this.status !== null) {
       return;
@@ -159,7 +161,9 @@ class Level {
 
 class LevelParser {
   constructor(actorObject = {}) {
+    // я бы назвал actorsMap
     this.actorObject = Object.create(actorObject);
+    // а это obstaclesMap
     this.symbols = {'x': 'wall', '!': 'lava'};
   }
 
@@ -176,6 +180,7 @@ class LevelParser {
   }
 
   createActors(actors = []) {
+    // заменить на reduce или forEach
     return actors.map((row, firstIndex) => {
       return row.split('')
         .map((symbol, index) => {
