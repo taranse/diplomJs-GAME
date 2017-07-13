@@ -180,15 +180,12 @@ class LevelParser {
     return actors.reduce((array, actor, firstIndex) => {
       actor.split('').forEach((symbol, index) => {
         let constructorOfActor = this.actorFromSymbol(symbol);
-        if (constructorOfActor === undefined) {
-          return;
-        }
         if (typeof constructorOfActor === 'function') {
           let actor = new constructorOfActor(new Vector(index, firstIndex));
           if (!(actor instanceof Actor)) {
             return;
           }
-          return array.push(actor);
+          array.push(actor);
         }
       });
       return array;
@@ -218,11 +215,12 @@ class Fireball extends Actor {
   }
 
   act(time, level) {
-    let pos = new Vector(this.getNextPosition(time).x, this.getNextPosition(time).y);
+    let nextPosition = this.getNextPosition(time);
+    let pos = new Vector(nextPosition.x, nextPosition.y);
     if (level.obstacleAt(pos, this.size)) {
       this.handleObstacle();
     } else {
-      this.pos = this.getNextPosition(time);
+      this.pos = nextPosition;
     }
   }
 }
@@ -274,7 +272,7 @@ class Coin extends Actor {
 
   getNextPosition(time = 1) {
     this.updateSpring(time);
-    return new Vector(this.position.x, this.position.y + this.getSpringVector().y);
+    return this.position.plus(this.getSpringVector());
   }
 
   act(time) {
