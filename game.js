@@ -183,10 +183,9 @@ class LevelParser {
         let constructorOfActor = this.actorFromSymbol(symbol);
         if (typeof constructorOfActor === 'function') {
           let actor = new constructorOfActor(new Vector(index, firstIndex));
-          if (!(actor instanceof Actor)) {
-            return;
+          if (actor instanceof Actor) {
+            actors.push(actor);
           }
-          actors.push(actor);
         }
       });
     });
