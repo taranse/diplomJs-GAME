@@ -176,20 +176,21 @@ class LevelParser {
     return plan.map(row => row.split('').map(item => this.obstacleFromSymbol(item)));
   }
 
-  createActors(actors = []) {
-    return actors.reduce((array, actor, firstIndex) => {
-      actor.split('').forEach((symbol, index) => {
+  createActors(plan = []) {
+    let actors = [];
+    plan.forEach((strOfPlan, firstIndex) => {
+      strOfPlan.split('').forEach((symbol, index) => {
         let constructorOfActor = this.actorFromSymbol(symbol);
         if (typeof constructorOfActor === 'function') {
           let actor = new constructorOfActor(new Vector(index, firstIndex));
           if (!(actor instanceof Actor)) {
             return;
           }
-          array.push(actor);
+          actors.push(actor);
         }
       });
-      return array;
-    }, []);
+    });
+    return actors;
   }
 
   parse(plan) {
