@@ -35,7 +35,7 @@ function elt(name, className) {
 
 class DOMDisplay {
   constructor(parent, level) {
-    this.wrap = parent.appendChild(document.getElementById('game'));
+    this.wrap = parent.appendChild(elt("div", "game"));
     this.wrap.setAttribute('autofocus', true)
     this.level = level;
 
@@ -127,7 +127,7 @@ class DOMDisplay {
   }
 }
 
-var arrowCodes = { "left_button": "left", "up_button": "up", "right_button": "right" };
+var arrowCodes = { "left_button": "left", "up_button": "up", "right_button": "right", };
 
 function trackKeys(codes) {
   var pressed = Object.create(null);
