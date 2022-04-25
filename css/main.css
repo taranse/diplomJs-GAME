@@ -2,8 +2,13 @@ hidden {
   display: none;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  height: 100vh;
 }
 
 .background {
@@ -55,6 +60,29 @@ body {
 .game {
   overflow: hidden;
   max-width: 600px;
-  max-height: 450px;
+  height: 100%;
   position: relative;
+  background: rgb(52, 166, 251);
+}
+
+.footer {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+button {
+  background-color: transparent;
+  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-right {
+  display: flex;
+  align-items: center;
 }

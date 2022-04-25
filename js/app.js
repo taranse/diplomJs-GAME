@@ -13,7 +13,7 @@ function loadLevels() {
       if (xhr.status !== 200) {
         fail(xhr);
       }
-      
+
       done(xhr.responseText);
     });
     xhr.send();
@@ -35,7 +35,7 @@ function elt(name, className) {
 
 class DOMDisplay {
   constructor(parent, level) {
-    this.wrap = parent.appendChild(elt("div", "game"));
+    this.wrap = parent.appendChild(document.getElementById('game'));
     this.wrap.setAttribute('autofocus', true)
     this.level = level;
 
@@ -127,22 +127,28 @@ class DOMDisplay {
   }
 }
 
-var arrowCodes = { 37: "left", 38: "up", 39: "right" };
+var arrowCodes = { "left_button": "left", "up_button": "up", "right_button": "right" };
 
 function trackKeys(codes) {
   var pressed = Object.create(null);
 
   function handler(event) {
-    if (codes.hasOwnProperty(event.keyCode)) {
-      var down = event.type == "keydown";
-      pressed[codes[event.keyCode]] = down;
+    // console.log(pressed, event.currentTarget.id);
+    if (codes.hasOwnProperty(event.currentTarget.id)) {
+      var down = event.type == "touchstart";
+      pressed[codes[event.currentTarget.id]] = down;
       console.log(pressed);
       event.preventDefault();
     }
   }
 
-  addEventListener("keydown", handler);
-  addEventListener("keyup", handler);
+  // addEventListener("keydown", handler);
+  // addEventListener("keyup", handler);
+
+  Object.keys(arrowCodes).forEach(id => {
+    document.getElementById(id).addEventListener('touchstart', handler)
+    document.getElementById(id).addEventListener('touchend', handler)
+  });
 
   return pressed;
 }
