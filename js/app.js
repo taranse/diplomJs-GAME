@@ -4,15 +4,16 @@ function loadLevels() {
   return new Promise((done, fail) => {
     const xhr = new XMLHttpRequest();
     let url = './levels.json';
-    if (location.hostname !== 'localhost') {
-      url = 'https://netology-fbb-store-api.herokuapp.com/game-levels/';
-    }
+    // if (location.hostname !== 'localhost') {
+    //   url = 'https://netology-fbb-store-api.herokuapp.com/game-levels/';
+    // }
     xhr.open('GET', url);
     xhr.addEventListener('error', e => fail(xhr));
     xhr.addEventListener('load', e => {
       if (xhr.status !== 200) {
         fail(xhr);
       }
+      
       done(xhr.responseText);
     });
     xhr.send();
@@ -47,10 +48,10 @@ class DOMDisplay {
   drawBackground() {
     var table = elt("table", "background");
     table.style.width = this.level.width * scale + "px";
-    this.level.grid.forEach(function(row) {
+    this.level.grid.forEach(function (row) {
       var rowElt = table.appendChild(elt("tr"));
       rowElt.style.height = scale + "px";
-      row.forEach(function(type) {
+      row.forEach(function (type) {
         rowElt.appendChild(elt("td", type));
       });
     });
@@ -98,7 +99,7 @@ class DOMDisplay {
   scrollPlayerIntoView() {
     var width = this.wrap.clientWidth;
     var height = this.wrap.clientHeight;
-    var margin = width / 3;
+    var margin = width / 2.2;
 
     // The viewport
     var left = this.wrap.scrollLeft, right = left + width;
@@ -108,8 +109,8 @@ class DOMDisplay {
     if (!player) {
       return;
     }
-    var center = player.pos.plus(player.size.times(0.5))
-                   .times(scale);
+    var center = player.pos.plus(player.size.times(0.75))
+      .times(scale);
 
     if (center.x < left + margin)
       this.wrap.scrollLeft = center.x - margin;
@@ -126,43 +127,53 @@ class DOMDisplay {
   }
 }
 
-var arrowCodes = {37: "left", 38: "up", 39: "right"};
+var arrowCodes = { 37: "left", 38: "up", 39: "right" };
 
 function trackKeys(codes) {
   var pressed = Object.create(null);
+
   function handler(event) {
     if (codes.hasOwnProperty(event.keyCode)) {
       var down = event.type == "keydown";
       pressed[codes[event.keyCode]] = down;
+      console.log(pressed);
       event.preventDefault();
     }
   }
+
   addEventListener("keydown", handler);
   addEventListener("keyup", handler);
+
   return pressed;
 }
 
 function runAnimation(frameFunc) {
   var lastTime = null;
+
   function frame(time) {
     var stop = false;
     if (lastTime != null) {
       var timeStep = Math.min(time - lastTime, 100) / 1000;
       stop = frameFunc(timeStep) === false;
     }
+
     lastTime = time;
+
     if (!stop) {
       requestAnimationFrame(frame);
     }
   }
-  requestAnimationFrame(frame);
+
+  requestAnimationFrame(frame); // 0.016ms
 }
 
 function runLevel(level, Display) {
   initGameObjects();
+
   return new Promise(done => {
     var arrows = trackKeys(arrowCodes);
     var display = new Display(document.body, level);
+
     runAnimation(step => {
       level.act(step, arrows);
       display.drawFrame(step);
@@ -182,7 +193,7 @@ function initGameObjects() {
 
   initGameObjects.isInit = true;
 
-  Level.prototype.act = function(step, keys) {
+  Level.prototype.act = function (step, keys) {
     if (this.status !== null) {
       this.finishDelay -= step;
     }
@@ -263,6 +274,7 @@ function runGame(plans, Parser, Display) {
           }
         });
     }
+
     startLevel(0);
   });
 }

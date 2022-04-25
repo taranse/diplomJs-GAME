@@ -20,13 +20,13 @@ class Vector {
 class Actor {
   constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)) {
     if (!(pos instanceof Vector)) {
-      throw(new Error('Передана неправильная позиция'));
+      throw (new Error('Передана неправильная позиция'));
     }
     if (!(size instanceof Vector)) {
-      throw(new Error('Передан неправильный размер'));
+      throw (new Error('Передан неправильный размер'));
     }
     if (!(speed instanceof Vector)) {
-      throw(new Error('Передана неправильная скорость'));
+      throw (new Error('Передана неправильная скорость'));
     }
     this.pos = pos;
     this.size = size;
@@ -58,7 +58,7 @@ class Actor {
 
   isIntersect(actor) {
     if (!(actor instanceof Actor)) {
-      throw(new Error('Переданный аргумент неверного типа!'));
+      throw (new Error('Переданный аргумент неверного типа!'));
     }
     if (actor === this) {
       return false;
@@ -96,7 +96,7 @@ class Level {
 
   actorAt(actor) {
     if (!(actor instanceof Actor)) {
-      throw(new Error('Передан не верный аргумент!'));
+      throw (new Error('Передан не верный аргумент!'));
     }
 
     return this.actors.find(actorSelf => actor.isIntersect(actorSelf));
@@ -104,10 +104,10 @@ class Level {
 
   obstacleAt(position, size) {
     if (!(position instanceof Vector)) {
-      throw(new Error('Передана неверная позиция!'));
+      throw (new Error('Передана неверная позиция!'));
     }
     if (!(size instanceof Vector)) {
-      throw(new Error('Передан неверный размер!'));
+      throw (new Error('Передан неверный размер!'));
     }
 
     let left = Math.floor(position.x);
@@ -161,7 +161,7 @@ class Level {
 class LevelParser {
   constructor(actorObject = {}) {
     this.actorsMap = Object.create(actorObject);
-    this.obstaclesMap = {'x': 'wall', '!': 'lava'};
+    this.obstaclesMap = { 'x': 'wall', '!': 'lava' };
   }
 
   actorFromSymbol(symbol) {
